@@ -11,7 +11,9 @@ public class PickUpObject : MonoBehaviour
         if (!_isAvailable)
             return;
 
-        if (Vector3.Distance(_collector.transform.position, transform.position) < 3)
+        float distance = Vector3.Distance(_collector.transform.position, transform.position);
+
+        if (distance < 2)
             _collector.SetObject(this);
     }
 

@@ -6,6 +6,8 @@ public class Warehouse : MonoBehaviour
     [SerializeField] private List<Transform> _placementPositions;
 
     private Collector _collector;
+    private PlayerUI _playerUI;
+
     private PickUpObject _pickUpObject;
 
     private int _objectsValue;
@@ -14,20 +16,7 @@ public class Warehouse : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent(out Collector collector))
-        {
-            if (_objectsValue + 1 > _placementPositions.Count)
-            {
-                Debug.Log($"Пикап заполнен");
-                return;
-            }
-
-            _collector ??= collector;
-
-            Debug.Log(_collector.PickUpObject);
-
-            if (_collector.PickUpObject != null)
-                AllowThrow(_collector.PickUpObject);
-        }
+            TryAllowThrow(collector);
     }
 
     private void OnTriggerExit(Collider other)
@@ -43,18 +32,38 @@ public class Warehouse : MonoBehaviour
                 Throw();
     }
 
+    private void TryAllowThrow(Collector collector)
+    {
+        _collector ??= collector;
+        _playerUI ??= _collector.PlayerUI;   
+
+        if (_collector.PickUpObject != null)
+        {
+            if (_objectsValue + 1 > _placementPositions.Count)
+            {
+                _playerUI.FullTruckText.gameObject.SetActive(true);
+                return;
+            }
+
+            AllowThrow(_collector.PickUpObject);
+        }
+    }
+
     private void AllowThrow(PickUpObject pickUpObject)
     {
         _pickUpObject = pickUpObject;
         _isCanThrow = true;
 
-        Debug.Log(_isCanThrow);
+        _playerUI.ThrowButtonText.gameObject.SetActive(true);
     }
 
     private void DisallowThrow()
     {
         _pickUpObject = null;
         _isCanThrow = false;
+
+        _playerUI.ThrowButtonText.gameObject.SetActive(false);
+        _playerUI.FullTruckText.gameObject.SetActive(false);
     }
 
     private void Throw()

@@ -1,15 +1,16 @@
-using DG.Tweening;
 using UnityEngine;
 
 public class Collector : MonoBehaviour
 {
     [SerializeField] private Transform _transferPosition;
+    [SerializeField] private PlayerUI _playerUI;
 
     private bool _isCanPickUp;
     private bool _isPickUp;
 
     private PickUpObject _pickUpObject;
 
+    public PlayerUI PlayerUI => _playerUI;
     public PickUpObject PickUpObject => _pickUpObject;
 
     private void Update()
@@ -24,6 +25,8 @@ public class Collector : MonoBehaviour
         if (_isPickUp)
             return;
 
+        _playerUI.PickUpButtonText.gameObject.SetActive(true);
+
         _pickUpObject = pickUpObject;
         _isCanPickUp = true;
     }
@@ -32,6 +35,8 @@ public class Collector : MonoBehaviour
     {
         if (_isPickUp)
             return;
+
+        _playerUI.PickUpButtonText.gameObject.SetActive(false);
 
         _pickUpObject = null;
         _isCanPickUp = false;
@@ -46,9 +51,11 @@ public class Collector : MonoBehaviour
     private void PickUp()
     {
         _pickUpObject.transform.parent = gameObject.transform;
-        _pickUpObject.transform.DOJump(_transferPosition.position, 1, 1, 0.1f);
+        _pickUpObject.transform.position = _transferPosition.position;
 
         _isCanPickUp = false;
         _isPickUp = true;
+
+        _playerUI.PickUpButtonText.gameObject.SetActive(false);
     }
 }
